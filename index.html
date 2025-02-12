@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>For My Love</title>
+  <style>
+    /* Reset and basic styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #1a0f3c, #4a1259);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Arial', sans-serif;
+      position: relative;
+    }
+    
+    /* Background gradient animation */
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Star styling and animation for twinkling effect */
+    .star {
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+      opacity: 0;
+      animation: twinkle 3s ease-in-out infinite;
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0; transform: scale(0.5); }
+      50% { opacity: 1; transform: scale(1); }
+    }
+    
+    /* Carnival Light styling for random bursts */
+    .carnival-light {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #ffea00, #ff8f00);
+      opacity: 0;
+      filter: drop-shadow(0 0 8px #ffea00);
+      animation: flash 1.5s ease-in-out forwards;
+      pointer-events: none;
+    }
+    @keyframes flash {
+      0% { opacity: 0; transform: scale(0.5); }
+      50% { opacity: 1; transform: scale(1.5); }
+      100% { opacity: 0; transform: scale(0.5); }
+    }
+    
+    /* Main container with perspective */
+    .scene {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      perspective: 1200px;
+      overflow: hidden;
+    }
+    
+    /* Bird element */
+    .bird {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      background: white;
+      clip-path: path('M 0,0 L 24,10 L 0,20 L 6,10 Z');
+      animation: fly 20s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+    }
+    @keyframes fly {
+      0% {
+        transform: translateX(-100vw) translateY(var(--y)) rotate(var(--angle)) scale(0.8);
+        opacity: 0;
+      }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% {
+        transform: translateX(100vw) translateY(calc(var(--y) + var(--drift))) rotate(var(--angle)) scale(0.8);
+        opacity: 0;
+      }
+    }
+    
+    /* Heart animations */
+    .heart {
+      position: absolute;
+      animation: float var(--duration) ease-in-out infinite;
+      opacity: 0;
+      font-size: 2rem;
+      filter: drop-shadow(0 0 10px rgba(255, 20, 20, 0.3));
+      transition: transform 0.3s ease;
+      pointer-events: none;
+    }
+    .heart:hover {
+      transform: scale(1.5) rotate(15deg);
+    }
+    @keyframes float {
+      0%, 100% {
+        transform: translate(0, 0) rotate(0deg) scale(1);
+      }
+      50% {
+        transform: translate(var(--x), var(--y)) rotate(var(--rotate)) scale(1.2);
+      }
+    }
+    
+    /* Confetti effect */
+    .confetti {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: red;
+      opacity: 0.9;
+      transform: rotate(0deg);
+      animation: confettiFall 2s ease-out forwards;
+      pointer-events: none;
+    }
+    @keyframes confettiFall {
+      0% {
+        opacity: 1;
+        transform: translate(0, 0) rotate(0deg);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(calc(var(--x) * 1.5px), 300px) rotate(360deg);
+      }
+    }
+    
+    /* Balloon effect for carnival */
+    .balloon {
+      position: absolute;
+      bottom: -50px;
+      width: 40px;
+      height: 55px;
+      background: linear-gradient(135deg, #ff77aa, #ffbbcc);
+      border-radius: 20px 20px 25px 25px;
+      filter: drop-shadow(0 0 8px rgba(255, 118, 170, 0.7));
+      opacity: 0.9;
+      animation: rise 8s ease-out forwards;
+      pointer-events: none;
+    }
+    .balloon::after {
+      content: '';
+      position: absolute;
+      bottom: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 2px;
+      height: 15px;
+      background: #fff;
+    }
+    @keyframes rise {
+      0% {
+        transform: translateX(var(--start)) translateY(0) scale(0.8);
+        opacity: 0.9;
+      }
+      50% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateX(var(--start)) translateY(-110vh) scale(1);
+        opacity: 0;
+      }
+    }
+    
+    /* Message styling and animation */
+    .message {
+      position: absolute;
+      color: #fff;
+      font-size: 3.5rem;
+      text-align: center;
+      width: 100%;
+      opacity: 0;
+      animation: fadeInOut 8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      text-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
+      transform-style: preserve-3d;
+      pointer-events: none;
+    }
+    @keyframes fadeInOut {
+      0%, 100% { opacity: 0; transform: scale(0.8) translateZ(-100px); }
+      25%, 75% { opacity: 1; transform: scale(1) translateZ(0); }
+      50% { transform: scale(1.1) translateZ(50px); }
+    }
+    
+    /* Butterfly element */
+    .butterfly {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      pointer-events: none;
+      transform-style: preserve-3d;
+    }
+    .butterfly::before,
+    .butterfly::after {
+      content: '';
+      position: absolute;
+      width: 15px;
+      height: 20px;
+      border-radius: 50% 50% 0 50%;
+      background: linear-gradient(45deg, rgba(255, 192, 203, 0.8), rgba(255, 150, 150, 0.8));
+      animation: flutter 0.8s ease-in-out infinite alternate;
+      filter: drop-shadow(0 0 5px rgba(255, 192, 203, 0.5));
+    }
+    .butterfly::after {
+      left: 15px;
+      transform: scaleX(-1);
+      animation-delay: 0.4s;
+    }
+    @keyframes flutter {
+      to {
+        transform: scaleX(0.8) translateY(-4px) rotateY(20deg);
+      }
+    }
+    
+    /* Center heart styling */
+    .center-heart {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 8rem;
+      animation: pulse 2s ease-in-out infinite;
+      filter: drop-shadow(0 0 20px rgba(255, 20, 20, 0.5));
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      user-select: none;
+    }
+    .center-heart:hover {
+      transform: translate(-50%, -50%) scale(1.2);
+    }
+    @keyframes pulse {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); filter: brightness(1); }
+      50% { transform: translate(-50%, -50%) scale(1.3); filter: brightness(1.2); }
+    }
+    
+    /* Media queries for responsiveness */
+    @media (max-width: 768px) {
+      .center-heart {
+        font-size: 6rem;
+      }
+      .message {
+        font-size: 2.5rem;
+      }
+      .heart {
+        font-size: 1.5rem;
+      }
+      .butterfly {
+        width: 24px;
+        height: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="scene" id="scene">
+    <div class="center-heart" id="centerHeart">❤️</div>
+  </div>
+
+  <script>
+    // DOM Elements
+    const scene = document.getElementById('scene');
+    const centerHeart = document.getElementById('centerHeart');
+    const messages = [
+      "Pauli Kuttyy..❤️..",
+      "Azhagu Kuttyy..❤️..",
+      "Ammuni Maa..❤️.."
+    ];
+
+    /* Utility: Create a random number in a range */
+    function random(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    /* Create star particles for a twinkling effect */
+    function createStar() {
+      const star = document.createElement('div');
+      star.className = 'star';
+      const size = random(2, 5);
+      star.style.width = `${size}px`;
+      star.style.height = `${size}px`;
+      star.style.top = `${random(0, window.innerHeight)}px`;
+      star.style.left = `${random(0, window.innerWidth)}px`;
+      star.style.animationDuration = `${random(2, 4)}s`;
+      scene.appendChild(star);
+      setTimeout(() => star.remove(), 5000);
+    }
+    
+    /* Create carnival light bursts */
+    function createCarnivalLight() {
+      const light = document.createElement('div');
+      light.className = 'carnival-light';
+      light.style.top = `${random(0, window.innerHeight)}px`;
+      light.style.left = `${random(0, window.innerWidth)}px`;
+      scene.appendChild(light);
+      setTimeout(() => light.remove(), 1500);
+    }
+
+    /* Function to create a bird element with randomized properties */
+    function createBird() {
+      const bird = document.createElement('div');
+      bird.className = 'bird';
+      bird.style.setProperty('--y', `${random(0, 100)}vh`);
+      bird.style.setProperty('--angle', `${random(-15, 15)}deg`);
+      bird.style.setProperty('--drift', `${random(-100, 100)}px`);
+      scene.appendChild(bird);
+      bird.addEventListener('animationend', () => bird.remove());
+    }
+
+    /* Function to create a butterfly element with a smooth sinusoidal flight */
+    function createButterfly() {
+      const butterfly = document.createElement('div');
+      butterfly.className = 'butterfly';
+      
+      let x = -30;
+      let y = random(0, window.innerHeight);
+      let amplitude = random(50, 150);
+      let frequency = random(0.01, 0.03);
+      let baseY = y;
+      
+      function updatePosition() {
+        x += 2;
+        y = baseY + Math.sin(x * frequency) * amplitude;
+        butterfly.style.left = `${x}px`;
+        butterfly.style.top = `${y}px`;
+        butterfly.style.transform = `rotate(${Math.sin(x * frequency) * 20}deg)`;
+        
+        if (x < window.innerWidth + 30) {
+          requestAnimationFrame(updatePosition);
+        } else {
+          butterfly.remove();
+        }
+      }
+      
+      scene.appendChild(butterfly);
+      requestAnimationFrame(updatePosition);
+    }
+
+    /* Function to create a floating heart element */
+    function createHeart(x = null, y = null) {
+      const heart = document.createElement('div');
+      heart.className = 'heart';
+      heart.innerHTML = '❤️';
+      heart.style.left = x !== null ? `${x}px` : `${random(0, 100)}vw`;
+      heart.style.top = y !== null ? `${y}px` : `${random(0, 100)}vh`;
+      heart.style.setProperty('--duration', `${random(2, 5)}s`);
+      heart.style.setProperty('--x', `${random(-50, 50)}px`);
+      heart.style.setProperty('--y', `${random(-50, 50)}px`);
+      heart.style.setProperty('--rotate', `${random(0, 360)}deg`);
+      heart.style.opacity = '1';
+      
+      scene.appendChild(heart);
+      setTimeout(() => {
+        heart.style.transition = 'all 1s';
+        heart.style.opacity = '0';
+        heart.style.transform = 'scale(0)';
+        setTimeout(() => heart.remove(), 1000);
+      }, 2000);
+    }
+
+    /* Function to create a sparkle effect */
+    function createSparkle() {
+      const sparkle = document.createElement('div');
+      sparkle.className = 'sparkle';
+      sparkle.style.left = `${random(0, 100)}vw`;
+      sparkle.style.top = `${random(0, 100)}vh`;
+      sparkle.style.setProperty('--duration', `${random(1, 3)}s`);
+      scene.appendChild(sparkle);
+      setTimeout(() => sparkle.remove(), 2000);
+    }
+
+    /* Function to display a random message */
+    function showMessage() {
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'message';
+      messageDiv.textContent = messages[Math.floor(Math.random() * messages.length)];
+      scene.appendChild(messageDiv);
+      setTimeout(() => messageDiv.remove(), 7900);
+    }
+
+    /* Function to create confetti pieces */
+    function createConfetti() {
+      const colors = ['#ff595e', '#ffca3a', '#8ac926', '#1982c4', '#6a4c93'];
+      for (let i = 0; i < 30; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.background = colors[Math.floor(random(0, colors.length))];
+        confetti.style.left = `${random(45, 55)}vw`;
+        confetti.style.top = `45vh`;
+        confetti.style.setProperty('--x', random(-100, 100));
+        scene.appendChild(confetti);
+        // Remove confetti after animation
+        setTimeout(() => confetti.remove(), 2000);
+      }
+    }
+
+    /* Function to create a carnival balloon */
+    function createBalloon() {
+      const balloon = document.createElement('div');
+      balloon.className = 'balloon';
+      // Set a random horizontal starting position using a CSS variable
+      balloon.style.setProperty('--start', `${random(-100, 100)}px`);
+      balloon.style.left = `${random(10, 90)}vw`;
+      scene.appendChild(balloon);
+      setTimeout(() => balloon.remove(), 8500);
+    }
+
+    /* Center heart click event creates a burst of hearts, butterflies, confetti, and a few balloons */
+    centerHeart.addEventListener('click', () => {
+      for (let i = 0; i < 20; i++) {
+        setTimeout(() => createHeart(), i * 50);
+      }
+      createButterfly();
+      createButterfly();
+      createConfetti();
+      // Launch several balloons on click
+      for (let j = 0; j < 3; j++) {
+        setTimeout(createBalloon, j * 300);
+      }
+    });
+
+    /* Mouse move event to create a heart trail if moved sufficiently */
+    let lastX = 0, lastY = 0;
+    document.addEventListener('mousemove', (e) => {
+      const distance = Math.hypot(e.clientX - lastX, e.clientY - lastY);
+      if (distance > 30) {
+        createHeart(e.clientX, e.clientY);
+        lastX = e.clientX;
+        lastY = e.clientY;
+      }
+    });
+
+    /* Intervals for continuous creation of animated elements */
+    setInterval(createBird, 3000);
+    setInterval(createButterfly, 4000);
+    setInterval(createHeart, 500);
+    setInterval(createStar, 700);
+    setInterval(showMessage, 8000);
+    // Add carnival lights and balloons at intermittent intervals
+    setInterval(createCarnivalLight, 1500);
+    setInterval(createBalloon, 7000);
+  </script>
+</body>
+</html>
