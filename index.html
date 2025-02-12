@@ -84,6 +84,28 @@
       }
     }
     
+    /* Explosion particle styling */
+    .explosion-particle {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: linear-gradient(45deg, #ff595e, #ffca3a, #8ac926, #1982c4, #6a4c93);
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 1;
+      animation: explosionAnim 1s ease-out forwards;
+    }
+    @keyframes explosionAnim {
+      0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(var(--dx), var(--dy)) scale(0.5);
+        opacity: 0;
+      }
+    }
+    
     /* Shooting Star styling */
     .shooting-star {
       position: absolute;
@@ -503,8 +525,8 @@
       const star = document.createElement('div');
       star.className = 'shooting-star';
       // Start at a random position along the top-left quadrant
-      star.style.left = `${random(0, window.innerWidth/2)}px`;
-      star.style.top = `${random(0, window.innerHeight/2)}px`;
+      star.style.left = `${random(0, window.innerWidth / 2)}px`;
+      star.style.top = `${random(0, window.innerHeight / 2)}px`;
       scene.appendChild(star);
       setTimeout(() => star.remove(), 1500);
     }
@@ -519,17 +541,47 @@
       scene.appendChild(note);
       setTimeout(() => note.remove(), 3000);
     }
+    
+    /* Function to create an explosion effect at the center heart */
+    function createExplosion() {
+      // Determine center of the heart element
+      const rect = centerHeart.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      // Create multiple particles
+      const particleCount = 30;
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'explosion-particle';
+        // Set a random direction and distance for the particle
+        const angle = random(0, 2 * Math.PI);
+        const distance = random(50, 150);
+        const dx = Math.cos(angle) * distance + 'px';
+        const dy = Math.sin(angle) * distance + 'px';
+        particle.style.setProperty('--dx', dx);
+        particle.style.setProperty('--dy', dy);
+        particle.style.left = centerX + 'px';
+        particle.style.top = centerY + 'px';
+        document.body.appendChild(particle);
+        setTimeout(() => particle.remove(), 1000);
+      }
+    }
 
-    /* Center heart click event creates a burst of hearts, butterflies, confetti, balloons, and a ripple */
+    /* Center heart click event creates an amazing animation */
     centerHeart.addEventListener('click', () => {
-      // Create a ripple effect when the heart is touched
+      // Create a ripple effect when the heart is clicked
       createRipple();
+      // Create an explosion effect at the center heart
+      createExplosion();
       
+      // Create burst of hearts
       for (let i = 0; i < 20; i++) {
         setTimeout(() => createHeart(), i * 50);
       }
+      // Create butterflies
       createButterfly();
       createButterfly();
+      // Create confetti burst
       createConfetti();
       // Launch several balloons on click
       for (let j = 0; j < 3; j++) {
