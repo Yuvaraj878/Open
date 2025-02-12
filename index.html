@@ -62,6 +62,72 @@
       100% { opacity: 0; transform: scale(0.5); }
     }
     
+    /* Ripple effect styling */
+    .ripple {
+      position: absolute;
+      border: 3px solid rgba(255, 255, 255, 0.7);
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      opacity: 0;
+      animation: rippleAnimation 1s ease-out forwards;
+      pointer-events: none;
+    }
+    @keyframes rippleAnimation {
+      0% {
+        opacity: 0.7;
+        transform: scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(15);
+      }
+    }
+    
+    /* Shooting Star styling */
+    .shooting-star {
+      position: absolute;
+      width: 3px;
+      height: 100px;
+      background: white;
+      opacity: 0;
+      transform: rotate(45deg);
+      filter: drop-shadow(0 0 10px white);
+      animation: shootingStar 1.5s ease-out forwards;
+      pointer-events: none;
+    }
+    @keyframes shootingStar {
+      0% {
+        opacity: 1;
+        transform: translate(0, 0) rotate(45deg);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(600px, 600px) rotate(45deg);
+      }
+    }
+    
+    /* Floating Love Note styling */
+    .love-note {
+      position: absolute;
+      font-size: 2rem;
+      color: #ffccff;
+      opacity: 1;
+      pointer-events: none;
+      animation: floatNote 3s ease-out forwards;
+      text-shadow: 0 0 10px rgba(255, 192, 203, 0.7);
+    }
+    @keyframes floatNote {
+      0% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-150px);
+        opacity: 0;
+      }
+    }
+    
     /* Main container with perspective */
     .scene {
       position: relative;
@@ -277,6 +343,10 @@
       "Azhagu Kuttyy..❤️..",
       "Ammuni Maa..❤️.."
     ];
+    const loveNotes = [
+      "Always & Forever",
+      "My Heart Beats For You"
+    ];
 
     /* Utility: Create a random number in a range */
     function random(min, max) {
@@ -415,9 +485,46 @@
       scene.appendChild(balloon);
       setTimeout(() => balloon.remove(), 8500);
     }
+    
+    /* Function to create a ripple effect from the center heart */
+    function createRipple() {
+      const ripple = document.createElement('div');
+      ripple.className = 'ripple';
+      // Position the ripple at the center heart's location
+      const heartRect = centerHeart.getBoundingClientRect();
+      ripple.style.left = `${heartRect.left + heartRect.width / 2 - 10}px`;
+      ripple.style.top = `${heartRect.top + heartRect.height / 2 - 10}px`;
+      document.body.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 1000);
+    }
 
-    /* Center heart click event creates a burst of hearts, butterflies, confetti, and a few balloons */
+    /* Function to create a shooting star */
+    function createShootingStar() {
+      const star = document.createElement('div');
+      star.className = 'shooting-star';
+      // Start at a random position along the top-left quadrant
+      star.style.left = `${random(0, window.innerWidth/2)}px`;
+      star.style.top = `${random(0, window.innerHeight/2)}px`;
+      scene.appendChild(star);
+      setTimeout(() => star.remove(), 1500);
+    }
+
+    /* Function to create a floating love note */
+    function createLoveNote(x, y) {
+      const note = document.createElement('div');
+      note.className = 'love-note';
+      note.textContent = loveNotes[Math.floor(random(0, loveNotes.length))];
+      note.style.left = `${x}px`;
+      note.style.top = `${y}px`;
+      scene.appendChild(note);
+      setTimeout(() => note.remove(), 3000);
+    }
+
+    /* Center heart click event creates a burst of hearts, butterflies, confetti, balloons, and a ripple */
     centerHeart.addEventListener('click', () => {
+      // Create a ripple effect when the heart is touched
+      createRipple();
+      
       for (let i = 0; i < 20; i++) {
         setTimeout(() => createHeart(), i * 50);
       }
@@ -428,6 +535,11 @@
       for (let j = 0; j < 3; j++) {
         setTimeout(createBalloon, j * 300);
       }
+    });
+
+    /* Double-click event on the scene to create a floating love note */
+    scene.addEventListener('dblclick', (e) => {
+      createLoveNote(e.clientX, e.clientY);
     });
 
     /* Mouse move event to create a heart trail if moved sufficiently */
@@ -450,6 +562,8 @@
     // Add carnival lights and balloons at intermittent intervals
     setInterval(createCarnivalLight, 1500);
     setInterval(createBalloon, 7000);
+    // Occasionally launch a shooting star every 10 seconds
+    setInterval(createShootingStar, 10000);
   </script>
 </body>
 </html>
